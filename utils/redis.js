@@ -1,5 +1,4 @@
 import { createClient } from 'redis';
-import redis from 'util';
 import { promisify } from 'util'
 
 class RedisClient {
@@ -9,6 +8,10 @@ class RedisClient {
         this.client.on('error', (error) => {
             console.error('Redis client not connected to the server:', error);
         });
+
+        this.client.on('end', () => {
+            console.error('Redis client connection closed');
+        })
 
         this.getAsync = promisify(this.client.get).bind(this.client)
         this.setAsync = promisify(this.client.set).bind(this.client)
@@ -25,12 +28,22 @@ class RedisClient {
     }
 
     async set(key, value, duration) {
-        await this.setAsync(key, value);
-        this.client.expire(key, duration);
+        if (duration <= 0) {
+            throw new Error('Duration must be a positive integer');
+        }
+
+        const success = await this.setAsync(key, value);
+        if (success) {
+            this.client.expire(key, duration);
+        }
     }
 
     async del(key) {
         await this.delAsync(key);
+    }
+
+    async quit() {
+        await this.client.quit();
     }
 
 }
