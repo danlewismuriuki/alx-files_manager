@@ -3,21 +3,22 @@ import { promisify } from 'util'
 
 class RedisClient {
     constructor() {
-        this.client = createClient({
-            host: '127.0.0.1',
-            port: '6379',
-        });
+        this.client = createClient();
+        this.isClientConnected = true;
 
         this.client.on('connect', () => {
-            console.log('Redis client connected to the server')
+            //console.log('Redis client connected to the server');
+            this.isClientConnected = true;
         });
 
         this.client.on('error', (error) => {
             console.error('Redis client not connected to the server:', error);
+            this.isClientConnected = false;
         });
 
         this.client.on('end', () => {
             console.error('Redis client connection closed');
+            this.isClientConnected = false;
         });
 
         this.getAsync = promisify(this.client.get).bind(this.client)
@@ -26,7 +27,7 @@ class RedisClient {
     }
 
     isAlive() {
-        return this.client.connected;
+        return this.isClientConnected;
     }
 
     async get(key) {
