@@ -4,8 +4,8 @@ const redisClient = require('../utils/redis');
 
 class AppController {
     static async getStatus(req, res) {
-        const isRedisAlive = redisClient.isAlive();
-        const isDbAlive = dbClient.isAlive();
+        const isRedisAlive = await redisClient.isAlive();
+        const isDbAlive = await dbClient.isAlive();
 
         return res.status(200).json({ redis: isRedisAlive, db: isDbAlive });
     };
@@ -18,4 +18,4 @@ class AppController {
     }
 }
 
-export default AppController;
+module.exports = AppController;
