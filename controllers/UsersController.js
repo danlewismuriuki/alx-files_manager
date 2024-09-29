@@ -29,7 +29,7 @@ class UserController {
         const result = await dbClient.usersCollection.insertOne(newUser);
         newUser._id = result.insertedId;
 
-        return res.status(201).json(newUser);
+        return res.status(201).json({ id: newUser._id, email: newUser.email });
     }
 }
 
