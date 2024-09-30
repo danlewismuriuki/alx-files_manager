@@ -31,7 +31,6 @@ class AuthController {
             if (hashedPassw !== user.password) {
                 return res.status(401).json({ error: 'Unauthorized' });
             }
-
             const token = uuidv4();
 
             const redisKey = `auth_${token}`;
@@ -42,7 +41,6 @@ class AuthController {
             console.error('Error during authentication:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
-
     }
 };
 
