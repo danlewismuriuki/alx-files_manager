@@ -42,6 +42,18 @@ class AuthController {
             return res.status(500).json({ error: 'Internal Server Error' });
         }
     }
+
+    static async getDisconnect(re, res) {
+        const token = req.header('X-Token');
+        const userId = await redisClient.get(`auth_{token}`);
+
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        await redisClient.del(`auth_${token}`);
+    };
+
 };
 
 module.exports = AuthController;
