@@ -14,7 +14,7 @@ router.post('/users', UsersController.postNew);
 // Auth
 router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisConnect);
-router.get('/users/me', AuthController.getMe);
+router.get('/users/me', UserController.getMe);
 
 
 
