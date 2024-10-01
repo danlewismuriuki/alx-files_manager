@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 
 class AuthController {
     static async getConnect(req, res) {
-        const authHeader = req.headers['Authorization'];
+        const authHeader = req.headers['authorization'];
 
         if (!authHeader || !authHeader.startsWith('Basic ')) {
             return res.status(401).json({ error: 'Unauthorized' })
@@ -44,7 +44,7 @@ class AuthController {
     }
 
     static async getDisconnect(req, res) {
-        const token = req.header('X-Token');
+        const token = req.headers['X-Token'];
         const userId = await redisClient.get(`auth_${token}`);
 
         if (!userId) {
