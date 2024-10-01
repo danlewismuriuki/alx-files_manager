@@ -1,6 +1,7 @@
 const crypto = require('node:crypto');
 const dbClient = require('../utils/db');
 const redisClient = require('../utils/redis');
+const { ObjectId } = require('mongodb');
 
 class UsersController {
     static async postNew(req, res) {
@@ -34,21 +35,26 @@ class UsersController {
     }
     static async getMe(req, res) {
         const token = req.header('X-Token');
+        //console.log("Received token:", token);
 
         const userId = await redisClient.get(`auth_${token}`);
+        //console.log("Retrieved user ID from Redis:", userId);
         if (!userId) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
         try {
-            const user = await dbClient.usersCollection.findOne({ _id: userId });
+            //const user = await dbClient.usersCollection.findOne({ _id: userId });
+            const user = await dbClient.usersCollection.findOne({ _id: ObjectId(userId) });
+
+            //console.log("Attempting to find user with ID:", userId); // 3
             if (!user) {
                 return res.status(401).json({ error: 'Unauthorized' });
             }
             return res.status(200).json({ id: user._id, email: user.email });
 
         } catch (error) {
-            console.error('Error retrieving user profile:', error);
+            //console.error('Error retrieving user profile:', error);  // 4
             return res.status(500).json({ error: 'Internal Server Error ' });
         }
     }
