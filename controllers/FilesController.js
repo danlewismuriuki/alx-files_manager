@@ -1,8 +1,9 @@
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
+
 const fs = require('fs');
 const path = require('path');
-const { v4: uuidv4 } = require();
+const { v4: uuidv4 } = require('uuid');
 const { ObjectId } = require('mongodb');
 
 class FilesController {
@@ -24,12 +25,12 @@ class FilesController {
             return res.status(400).json({ error: 'Missing type' });
         }
 
-        if (type !== 'folder' && 'data') {
+        if (type !== 'folder' && '!data') {
             return res.status(400).json({ error: 'Missing data' });
         }
 
-        if (parentId !== 0) {
-            const parentFile = await dbClient.filesColelction().findOne({
+        if (parentFile !== 0) {
+            const parentFile = await dbClient.filesCollection().findOne({
                 _id: ObjectId(parentId), userId: ObjectId(userId)
             });
             if (!parentId) {
@@ -50,7 +51,7 @@ class FilesController {
 
           if (type === 'folder') {
             const result = await dbClient.filesCollection.insertOne(newFile);
-            return res.status(201).json(result.op[0]);
+            return res.status(201).json(result.ops[0]);
           }
 
           const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -70,4 +71,4 @@ class FilesController {
     }
 };
 
-module.export = FilesController;
+module.exports = FilesController;
