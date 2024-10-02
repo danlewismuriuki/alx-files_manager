@@ -15,7 +15,7 @@ class FilesController {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        const { name, type, parentId = 0, isPublic, data } = req.body;
+        const { name, type, parentId = 0, isPublic = false, data } = req.body;
 
         if (!name) {
             return res.status(400).json({ error: 'Missing name' });
@@ -30,11 +30,18 @@ class FilesController {
         }
 
         if (parentId !== 0) {
+            console.log(`Checking parent file with parentId: ${parentId} for userId: ${userId}`); // 1
+            if (!ObjectId.isValid(parentId)) {
+                return res.status(400).json({ error: 'Invalid Parent ID' });
+            }
+
             const parentFile = await dbClient.filesCollection.findOne({
-                _id: ObjectId(parentId), userId: ObjectId(userId)
+                _id: new ObjectId(parentId), userId: new ObjectId(userId)
             });
+
             if (!parentFile) {
-                return res.status(400).json({ error: 'Parent not found'});
+                console.log(`Parent not found for parentId: ${parentId}`); // 3
+                return res.status(400).json({ error: 'Parent not found' });
             }
             if (parentFile.type !== 'folder') {
                 return res.status(400).json({ error: 'Parent is not a Folder' })
@@ -47,27 +54,40 @@ class FilesController {
             isPublic,
             parentId: parentId === 0 ? 0 : parentId,
             createdAt: new Date(),
-          };
+        };
 
-          if (type === 'folder') {
+        if (type === 'folder') {
             const result = await dbClient.filesCollection.insertOne(newFile);
             return res.status(201).json(result.ops[0]);
-          }
+        }
 
-          const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
-          if (!fs.existsSync(folderPath)) {
-            fs.mkdirSync(folderPath, { recursive: true});
-          }
+        const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
+        if (!fs.existsSync(folderPath)) {
+            fs.mkdirSync(folderPath, { recursive: true });
+        }
 
-          const fileUUID = uuidv4();
-          const filePath = path.join(folderPath, fileUUID);
+        const fileUUID = uuidv4();
+        const filePath = path.join(folderPath, fileUUID);
 
-          const fileData = Buffer.from(data, 'base64');
-          fs.writeFileSync(filePath, fileData);
+        console.log(`Saving file to: ${filePath}`); // 3
+        const fileData = Buffer.from(data, 'base64');
+        try {
+            fs.writeFileSync(filePath, fileData);
+        } catch (err) {
+            console.error('Error writing file:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
 
-          newFile.localPath = filePath;
-          const result = await dbClient.filesCollection.insertOne(newFile);
-          return res.status(201).json(result.ops[0]);
+        newFile.localPath = filePath;
+        const result = await dbClient.filesCollection.insertOne(newFile);
+
+        const file = result.ops[0];
+        // file.id = file._id;
+        // delete file._id;
+        // const { _id, ...fileWithoutId } = file;
+        // fileWithoutId.id = _id;
+
+        return res.status(201).json(file);
     }
 };
 
