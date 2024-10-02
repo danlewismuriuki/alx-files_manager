@@ -22,7 +22,26 @@ class DBClient {
         this.db = false;
       }
     });
+
+    // this.db = null;
+    // this.usersCollection = null;
+    // this.filesCollection = null;
+    // this.client = null;
   }
+
+  // async connect() {
+  //   try {
+  //     const client = await MongoClient.connect(url, { useUnifiedTopology: true });
+  //     console.log('Connected successfully to server');
+  //     this.client = client;
+  //     this.db = client.db(DB_DATABASE);
+  //     this.usersCollection = this.db.collection('users');
+  //     this.filesCollection = this.db.collection('files');
+  //   } catch (err) {
+  //     console.error('Error connecting to MongoDB:', err.message);
+  //     this.db = false;
+  //   }
+  // }
 
   /**
      * Checks if connection to Redis is Alive
