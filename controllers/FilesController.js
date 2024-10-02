@@ -3,7 +3,7 @@ const dbClient = require('../utils/db');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require();
-
+const { ObjectId } = require('mongodb');
 
 class FilesController {
     static async postUpload(req, res) {
@@ -28,6 +28,17 @@ class FilesController {
             return res.status(400).json({ error: 'Missing data' });
         }
 
+        if (parentId !== 0) {
+            const parentFile = await dbClient.filesColelction().findOne({
+                _id: ObjectId(parentId), userId: ObjectId(userId)
+            });
+            if (!parentId) {
+                return res.status(400).json({ error: 'Parent not found'});
+            }
+            if (parentFile.type !== 'folder') {
+                return res.status(400).json({ error: 'Parent is not a Folder' })
+            }
+        }
 
     }
 };
