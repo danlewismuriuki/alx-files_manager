@@ -24,5 +24,10 @@ class FilesController {
             return res.status(400).json({ error: 'Missing type' });
         }
 
+        if (type !== 'folder' && 'data') {
+            return res.status(400).json({ error: 'Missing data' });
+        }
+
+
     }
 };
