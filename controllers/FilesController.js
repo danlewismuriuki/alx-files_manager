@@ -39,6 +39,19 @@ class FilesController {
                 return res.status(400).json({ error: 'Parent is not a Folder' })
             }
         }
+        const newFile = {
+            userId,
+            name,
+            type,
+            isPublic,
+            parentId: parentId === 0 ? 0 : parentId,
+            createdAt: new Date(),
+          };
 
+          if (type === 'folder') {
+            result = await dbClient.filesCollection.insertOne(newFile);
+
+            return res.status(201).json(result.)
+          }
     }
 };
