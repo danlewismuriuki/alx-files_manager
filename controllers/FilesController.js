@@ -62,10 +62,12 @@ class FilesController {
           const filePath = path.join(folderPath, fileUUID);
 
           const fileData = Buffer.from(data, 'base64');
-          f
+          fs.writeFileSync(filePath, fileData);
 
-
-
-
+          newFile.localPath = filePath;
+          const result = await dbClient.filesCollection.insertOne(newFile);
+          return res.status(201).json(result.ops[0]);
     }
 };
+
+module.export = FilesController;
