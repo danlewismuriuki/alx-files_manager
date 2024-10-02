@@ -53,5 +53,19 @@ class FilesController {
             return res.status(201).json(result.)
           }
 
+          const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
+          if (!fs.existsSync(folderPath)) {
+            fs.mkdirSync(folderPath, { recursive: true});
+          }
+
+          const fileUUID = uuidv4();
+          const filePath = path.join(folderPath, fileUUID);
+
+          const fileData = Buffer.from(data, 'base64');
+          f
+
+
+
+
     }
 };
