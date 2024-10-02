@@ -50,7 +50,7 @@ class FilesController {
 
           if (type === 'folder') {
             const result = await dbClient.filesCollection.insertOne(newFile);
-            return res.status(201).json(result.)
+            return res.status(201).json(result.op[0]);
           }
 
           const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
