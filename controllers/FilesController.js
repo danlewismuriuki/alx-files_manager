@@ -49,9 +49,9 @@ class FilesController {
           };
 
           if (type === 'folder') {
-            result = await dbClient.filesCollection.insertOne(newFile);
-
+            const result = await dbClient.filesCollection.insertOne(newFile);
             return res.status(201).json(result.)
           }
+
     }
 };
